@@ -46,6 +46,38 @@ app.post('/login', async (req, res) => {
 });
 
 
+app.post('/register', async (req, res) => {
+  const { name, email, password, role } = req.body;
+  try {
+    // Check if email already exists
+    const [existingUsers] = await db.query(
+      "SELECT id FROM users WHERE email = ?", 
+      [email]
+    );
+    if (existingUsers.length > 0) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Email already registered" 
+      });
+    }
+    // Insert new user
+    const [result] = await db.query(
+      "INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)",
+      [name, email, password, role]
+    );
+
+    res.status(201).json({
+      success: true,
+      message: "User registered successfully",
+      userId: result.insertId
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+});
+
+
 
 
 

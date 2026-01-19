@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home.jsx';
-
+import ResidentDashboard from './pages/ResidentDashboard';
 // (Optional) You can create these in separate files in /pages/
 const ServicesPage = () => <div className="p-10 text-center">Services Page Content</div>;
 const ClearancePage = () => <div className="p-10 text-center">Clearance Page Content</div>;
@@ -20,8 +20,9 @@ function App() {
         <Route path="/clearance" element={<ClearancePage />} />
         
         {/* Dashboard routes referenced in LoginModal */}
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/dashboard" element={<ResidentDashboard />} />
         <Route path="/admin-dashboard" element={<AdminDashboard />} />
+          
       </Routes>
     </Router>
   );

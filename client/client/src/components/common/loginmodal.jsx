@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../../API/axios';
 import { useNavigate } from 'react-router-dom';
 
 const LoginModal = ({ onClose }) => {
@@ -14,9 +14,7 @@ const LoginModal = ({ onClose }) => {
     setErrorMessage(''); // Clear previous errors
 
     try {
-      // Use a default API URL or check if environment variable exists
-      const apiUrl = import.meta.env.VITE_REACT_APP_API_URL || 'http://localhost:5000';
-      const response = await axios.post(`${apiUrl}/login`, { 
+      const response = await api.post('/login', { 
         email, 
         password, 
         role 
