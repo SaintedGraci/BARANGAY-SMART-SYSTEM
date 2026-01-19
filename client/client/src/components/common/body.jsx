@@ -1,6 +1,6 @@
 import React from 'react';
 import barangayImg from '../../assets/barangay.jpg';
-
+import { Link } from 'react-router-dom';
 const Body = () => {
   return (
     <main className="relative min-h-screen w-full overflow-hidden">
@@ -35,13 +35,19 @@ const Body = () => {
             request documents, and stay informed with real-time updates.
           </p>
 
+          
           <div className="mt-10 flex flex-wrap gap-4">
+            <Link to="/register">
             <button className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold transition-all hover:shadow-[0_0_20px_rgba(37,99,235,0.4)] active:scale-95">
               Get Started
             </button>
-            <button className="px-8 py-4 bg-white/10 hover:bg-white/20 text-white border border-white/20 rounded-2xl font-bold backdrop-blur-md transition-all active:scale-95">
-              Learn More
-            </button>
+  </Link>
+
+            <Link to="/learnmore">
+              <button className="px-8 py-4 bg-white/10 hover:bg-white/20 text-white border border-white/20 rounded-2xl font-bold backdrop-blur-md transition-all active:scale-95">
+                Learn More
+              </button>
+            </Link>
           </div>
         </div>
       </div>
