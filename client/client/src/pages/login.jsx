@@ -1,125 +1,213 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { MapPin, Mail, Lock, ArrowLeft, LogIn } from 'lucide-react';
-import axios from 'axios';
+import { useState } from 'react';
+import { Mail, Lock, Eye, EyeOff, LogIn, AlertCircle, ArrowLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import api from '../API/axios';
+import municipalityLogo from '../assets/alicia.jpg';
 
 const Login = () => {
-  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
-  const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [message, setMessage] = useState('');
+  const [messageType, setMessageType] = useState(''); // 'success' or 'error'
+  const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    // Clear message when user starts typing
+    if (message) {
+      setMessage('');
+      setMessageType('');
+    }
+  };
+
+  const handleLogin = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
+    setMessage('');
+    setMessageType('');
+
     try {
-      // Note: We are only checking email and password. 
-      // The backend will verify if this user is a 'resident'.
-      const response = await axios.post('http://localhost:8081/login', {
-        email: formData.email,
-        password: formData.password,
-        role: 'resident' // Hardcoded here so residents only can enter
+      // Try resident login first
+      const response = await api.post('/auth/login', {
+        ...formData,
+        userType: 'resident'
       });
-      
+
       if (response.data.success) {
-        // Save user data to local storage or state
+        // Save user data and token
+        localStorage.setItem('token', response.data.token);
         localStorage.setItem('user', JSON.stringify(response.data.user));
-        navigate('/dashboard'); // Direct them to their portal
+        
+        setMessage('Login successful! Redirecting...');
+        setMessageType('success');
+        
+        // Redirect after a short delay
+        setTimeout(() => {
+          navigate('/dashboard');
+        }, 1500);
       }
     } catch (err) {
-      setError(err.response?.data?.message || "Invalid email or password");
+      console.error('Login error:', err);
+      if (err.response?.data?.message) {
+        setMessage(err.response.data.message);
+      } else if (err.response?.status === 401) {
+        setMessage('Invalid email or password');
+      } else {
+        setMessage('Unable to connect to server. Please try again.');
+      }
+      setMessageType('error');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2 bg-white">
-      
-      {/* Left Side: Resident Welcome Branding */}
-      <div className="hidden lg:flex flex-col justify-between bg-slate-900 p-12 text-white relative overflow-hidden">
-        <div className="relative z-10">
-          <Link to="/" className="flex items-center gap-2 mb-16">
-            <div className="bg-blue-600 p-2 rounded-lg text-white">
-              <MapPin size={24} />
-            </div>
-            <span className="font-bold text-2xl tracking-tight">BrgySmart</span>
-          </Link>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        {/* Back Button */}
+        <button
+          onClick={() => navigate('/')}
+          className="flex items-center gap-2 text-gray-600 hover:text-gray-800 mb-8 transition-colors"
+        >
+          <ArrowLeft size={20} />
+          Back to Home
+        </button>
 
-          <div className="max-w-md">
-            <h1 className="text-5xl font-bold leading-tight mb-6">
-              Welcome Back, <br /> Neighbor.
-            </h1>
-            <p className="text-slate-400 text-lg leading-relaxed">
-              Login to access your resident dashboard, check request statuses, 
-               and view the latest community updates.
-            </p>
+        {/* Login Card */}
+        <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
+          {/* Header */}
+          <div className="bg-gradient-to-br from-blue-600 to-blue-700 px-8 py-10 text-white text-center">
+            <div className="flex items-center justify-center mb-4">
+              <div className="w-16 h-16 rounded-full overflow-hidden bg-white/20 p-1">
+                <img 
+                  src={municipalityLogo} 
+                  alt="Municipality of Alicia Logo" 
+                  className="w-full h-full object-cover rounded-full"
+                />
+              </div>
+            </div>
+            <h1 className="text-3xl font-bold mb-2">Welcome Back</h1>
+            <p className="text-blue-100">Sign in to your resident account</p>
+          </div>
+
+          {/* Form */}
+          <div className="p-8">
+            {message && (
+              <div className={`p-4 rounded-xl mb-6 flex items-start gap-3 ${
+                messageType === 'success' 
+                  ? 'bg-green-50 border border-green-200 text-green-700' 
+                  : 'bg-red-50 border border-red-200 text-red-700'
+              }`}>
+                <AlertCircle size={20} className={`mt-0.5 flex-shrink-0 ${
+                  messageType === 'success' ? 'text-green-500' : 'text-red-500'
+                }`} />
+                <div>
+                  <p className="font-medium text-sm">
+                    {messageType === 'success' ? 'Success!' : 'Login Failed'}
+                  </p>
+                  <p className="text-sm opacity-90">{message}</p>
+                </div>
+              </div>
+            )}
+
+            <form onSubmit={handleLogin} className="space-y-6">
+              {/* Email Input */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Email Address
+                </label>
+                <div className="relative">
+                  <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    placeholder="Enter your email"
+                    required
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl py-4 pl-12 pr-4 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all text-lg"
+                  />
+                </div>
+              </div>
+
+              {/* Password Input */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Password
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    name="password"
+                    value={formData.password}
+                    onChange={handleInputChange}
+                    placeholder="Enter your password"
+                    required
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl py-4 pl-12 pr-12 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all text-lg"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                  >
+                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Login Button */}
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 rounded-xl font-semibold hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg shadow-blue-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-lg"
+              >
+                {isLoading ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                    Signing In...
+                  </>
+                ) : (
+                  <>
+                    <LogIn size={20} />
+                    Sign In
+                  </>
+                )}
+              </button>
+            </form>
+
+            {/* Additional Links */}
+            <div className="mt-8 space-y-4">
+              <div className="text-center">
+                <button className="text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors">
+                  Forgot your password?
+                </button>
+              </div>
+              
+              <div className="text-center text-gray-500 text-sm">
+                Don't have an account?{' '}
+                <button 
+                  onClick={() => navigate('/register')}
+                  className="text-blue-600 hover:text-blue-700 font-medium transition-colors"
+                >
+                  Sign up here
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="relative z-10 flex items-center gap-4 text-sm text-slate-500">
-          <span className="flex items-center gap-1"><LogIn size={14}/> Secure Resident Portal</span>
-        </div>
-
-        {/* Abstract background shape */}
-        <div className="absolute top-1/2 -right-20 w-96 h-96 bg-blue-600/20 rounded-full blur-[120px]"></div>
-      </div>
-
-      {/* Right Side: Login Form */}
-      <div className="flex items-center justify-center p-8 md:p-16">
-        <div className="w-full max-w-sm">
-          <Link to="/" className="inline-flex items-center gap-2 text-slate-500 hover:text-blue-600 mb-8 transition-colors group">
-            <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
-            Back to Home
-          </Link>
-
-          <h2 className="text-3xl font-bold text-slate-900 mb-2">Resident Login</h2>
-          <p className="text-slate-500 mb-8">Enter your credentials to access your account.</p>
-
-          {error && (
-            <div className="bg-red-50 text-red-600 p-4 rounded-xl mb-6 text-sm border border-red-100">
-              {error}
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-2">
-              <label className="text-sm font-semibold text-slate-700">Email Address</label>
-              <div className="relative">
-                <Mail className="absolute left-4 top-3.5 text-slate-400" size={20} />
-                <input 
-                  type="email" required
-                  placeholder="name@email.com"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3.5 pl-12 pr-4 focus:ring-2 focus:ring-blue-500 outline-none transition-all"
-                  onChange={(e) => setFormData({...formData, email: e.target.value})}
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <label className="text-sm font-semibold text-slate-700">Password</label>
-                <a href="#" className="text-xs font-bold text-blue-600 hover:underline">Forgot?</a>
-              </div>
-              <div className="relative">
-                <Lock className="absolute left-4 top-3.5 text-slate-400" size={20} />
-                <input 
-                  type="password" required
-                  placeholder="••••••••"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3.5 pl-12 pr-4 focus:ring-2 focus:ring-blue-500 outline-none transition-all"
-                  onChange={(e) => setFormData({...formData, password: e.target.value})}
-                />
-              </div>
-            </div>
-
-            <button type="submit" className="w-full bg-blue-600 text-white py-4 rounded-xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 mt-2 active:scale-[0.98]">
-              Sign In
-            </button>
-          </form>
-
-          <p className="mt-8 text-center text-slate-600">
-            Don't have an account? {' '}
-            <Link to="/register" className="text-blue-600 font-bold hover:underline">Register here</Link>
-          </p>
+        {/* Footer */}
+        <div className="text-center mt-8 text-gray-500 text-sm">
+          <p>© 2024 Municipality of Alicia. All rights reserved.</p>
         </div>
       </div>
     </div>

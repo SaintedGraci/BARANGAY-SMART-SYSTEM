@@ -15,7 +15,7 @@ const LearnMore = () => {
             Bridging the Gap Between <span className="text-blue-600">Public Service</span> and Technology
           </h1>
           <p className="text-lg text-slate-600 leading-relaxed">
-            BrgySmart is designed to modernize barangay operations by providing a seamless, 
+            MuniSmart is designed to modernize municipal operations by providing a seamless, 
             paperless, and transparent platform for every resident.
           </p>
         </div>

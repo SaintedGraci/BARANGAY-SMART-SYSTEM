@@ -26,7 +26,7 @@ const ResidentDashboard = () => {
       {/* Sidebar */}
       <aside className="w-64 bg-white border-r border-slate-200 hidden md:flex flex-col">
         <div className="p-6 border-b border-slate-100 font-bold text-xl text-blue-600 flex items-center gap-2">
-          <LayoutDashboard /> BrgySmart
+          <LayoutDashboard /> MuniSmart
         </div>
         <nav className="flex-1 p-4 space-y-2">
           <button className="w-full flex items-center gap-3 px-4 py-3 bg-blue-50 text-blue-600 rounded-xl font-medium">
@@ -57,7 +57,7 @@ const ResidentDashboard = () => {
         <header className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-2xl font-bold text-slate-900">Welcome, {userData?.name || 'Resident'}!</h1>
-            <p className="text-slate-500">Here is what's happening in your barangay today.</p>
+            <p className="text-slate-500">Here is what's happening in your municipality today.</p>
           </div>
           <div className="flex items-center gap-4">
             <div className="text-right hidden sm:block">
@@ -110,7 +110,7 @@ const ResidentDashboard = () => {
               <button className="p-4 border border-slate-100 rounded-xl hover:border-blue-300 hover:bg-blue-50 transition-all text-left">
                 <FileText className="text-blue-600 mb-2" />
                 <p className="font-semibold text-slate-800">Clearance</p>
-                <p className="text-xs text-slate-500">Barangay Clearance</p>
+                <p className="text-xs text-slate-500">Municipal Clearance</p>
               </button>
               <button className="p-4 border border-slate-100 rounded-xl hover:border-blue-300 hover:bg-blue-50 transition-all text-left">
                 <FileText className="text-blue-600 mb-2" />
@@ -125,7 +125,7 @@ const ResidentDashboard = () => {
               <button className="p-4 border border-slate-100 rounded-xl hover:border-blue-300 hover:bg-blue-50 transition-all text-left">
                 <FileText className="text-blue-600 mb-2" />
                 <p className="font-semibold text-slate-800">Business</p>
-                <p className="text-xs text-slate-500">Barangay Permit</p>
+                <p className="text-xs text-slate-500">Municipal Permit</p>
               </button>
             </div>
           </div>
@@ -146,7 +146,7 @@ const ResidentDashboard = () => {
                 <div className="h-2 w-2 bg-slate-300 rounded-full mt-2 ring-4 ring-slate-50"></div>
                 <div>
                   <p className="font-bold text-slate-800">Free Vaccination Clinic</p>
-                  <p className="text-sm text-slate-500 leading-relaxed">The Brgy. Health Center will be offering free booster shots starting tomorrow.</p>
+                  <p className="text-sm text-slate-500 leading-relaxed">The Municipal Health Center will be offering free booster shots starting tomorrow.</p>
                   <p className="text-xs text-slate-400 mt-2">Posted Yesterday</p>
                 </div>
               </div>

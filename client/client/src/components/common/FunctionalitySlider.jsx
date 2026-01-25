@@ -11,12 +11,12 @@ import 'swiper/css/pagination';
 const functionalities = [
   {
     title: "Request Documents",
-    desc: "Apply for Barangay Clearance, Indigency, and Residency certificates online.",
+    desc: "Apply for Municipal Clearance, Indigency, and Residency certificates online.",
     icon: <FileText size={32} />,
     color: "bg-blue-500"
   },
   {
-    title: "Blotter Reports",
+    title: "Incident Reports",
     desc: "Securely file and track incident reports and community concerns.",
     icon: <ShieldCheck size={32} />,
     color: "bg-red-500"
@@ -41,7 +41,7 @@ const functionalities = [
   },
   {
     title: "Appointment System",
-    desc: "Schedule your visit to the Barangay Hall to avoid long queues.",
+    desc: "Schedule your visit to the Municipal Hall to avoid long queues.",
     icon: <Clock size={32} />,
     color: "bg-indigo-500"
   }
@@ -54,7 +54,7 @@ const FunctionalitySlider = () => {
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold text-slate-900 mb-4">Our Services</h2>
           <p className="text-slate-500 max-w-2xl mx-auto text-lg">
-            Everything you need from your Barangay, simplified and accessible in one digital platform.
+            Everything you need from your Municipality, simplified and accessible in one digital platform.
           </p>
         </div>
 
