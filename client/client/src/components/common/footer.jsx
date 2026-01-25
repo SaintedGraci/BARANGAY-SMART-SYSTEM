@@ -1,5 +1,5 @@
-import React from 'react';
-import { MapPin, Phone, Mail, Facebook, Twitter, Globe } from 'lucide-react';
+import { MapPin, Phone, Mail, Globe } from 'lucide-react';
+import municipalityLogo from '../../assets/alicia.jpg';
 
 const Footer = () => {
   return (
@@ -9,11 +9,18 @@ const Footer = () => {
           
           {/* Brand/About Section */}
           <div className="col-span-1">
-            <div className="flex items-center gap-2 text-white mb-6">
-              <div className="bg-blue-600 p-1.5 rounded-lg">
-                <MapPin size={20} />
+            <div className="flex items-center gap-3 text-white mb-6">
+              <div className="w-10 h-10 rounded-lg overflow-hidden shadow-md">
+                <img 
+                  src={municipalityLogo} 
+                  alt="Municipality of Alicia Logo" 
+                  className="w-full h-full object-cover"
+                />
               </div>
-              <span className="font-bold text-xl tracking-tight text-white">BrgySmart</span>
+              <div className="flex flex-col">
+                <span className="font-bold text-lg tracking-tight text-white leading-tight">Municipality of Alicia</span>
+                <span className="text-xs text-slate-400 leading-tight">Digital Portal</span>
+              </div>
             </div>
             <p className="text-sm leading-relaxed">
               Providing efficient, transparent, and accessible digital services to our 
@@ -32,14 +39,14 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Barangay Services */}
+          {/* Municipal Services */}
           <div>
             <h4 className="text-white font-bold mb-6">Services</h4>
             <ul className="space-y-4 text-sm">
               <li><a href="#" className="hover:text-blue-400 transition-colors">Barangay Clearance</a></li>
               <li><a href="#" className="hover:text-blue-400 transition-colors">Certificate of Indigency</a></li>
               <li><a href="#" className="hover:text-blue-400 transition-colors">Business Permits</a></li>
-              <li><a href="#" className="hover:text-blue-400 transition-colors">Blotter Report</a></li>
+              <li><a href="#" className="hover:text-blue-400 transition-colors">Incident Reports</a></li>
             </ul>
           </div>
 
@@ -48,16 +55,16 @@ const Footer = () => {
             <h4 className="text-white font-bold mb-6">Contact Us</h4>
             <ul className="space-y-4 text-sm">
               <li className="flex items-start gap-3">
-                <MapPin size={18} className="text-blue-500 shrink-0" />
-                <span>123 Barangay Hall St., <br />Bacolod City, Philippines</span>
+                <MapPin size={18} className="text-blue-500 shrink-0 mt-0.5" />
+                <span>Municipal Hall, <br />Alicia, Bohol, Philippines</span>
               </li>
               <li className="flex items-center gap-3">
                 <Phone size={18} className="text-blue-500 shrink-0" />
-                <span>+63 (034) 432-1234</span>
+                <span>+63 (038) 123-4567</span>
               </li>
               <li className="flex items-center gap-3">
                 <Mail size={18} className="text-blue-500 shrink-0" />
-                <span>support@brgysmart.gov.ph</span>
+                <span>info@alicia.gov.ph</span>
               </li>
             </ul>
           </div>
@@ -66,15 +73,28 @@ const Footer = () => {
         {/* Divider Line */}
         <hr className="border-slate-800 mb-8" />
 
-        {/* Bottom Bar: Copyright & Socials */}
+        {/* Bottom Bar: Copyright & Links */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-slate-500">
-          <p className="text-xs">
-            © 2026 BrgySmart Community Portal. All rights reserved.
-          </p>
+          <div className="flex items-center gap-3">
+            <div className="w-6 h-6 rounded overflow-hidden">
+              <img 
+                src={municipalityLogo} 
+                alt="Municipality of Alicia Logo" 
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <p className="text-xs">
+              © 2024 Municipality of Alicia. All rights reserved.
+            </p>
+          </div>
           <div className="flex items-center gap-6">
-            <Facebook size={18} className="cursor-pointer hover:text-white transition-colors" />
-            <Twitter size={18} className="cursor-pointer hover:text-white transition-colors" />
             <Globe size={18} className="cursor-pointer hover:text-white transition-colors" />
+            <a href="/barangay-login" className="text-xs text-slate-400 hover:text-white transition-colors font-medium">
+              Barangay Portal
+            </a>
+            <a href="/login" className="text-xs text-slate-400 hover:text-white transition-colors font-medium">
+              Resident Login
+            </a>
           </div>
         </div>
       </div>

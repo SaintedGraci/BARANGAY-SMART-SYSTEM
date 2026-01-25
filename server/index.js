@@ -1,85 +1,49 @@
 import express from 'express';
 import cors from 'cors';
-import db from './database.js'; // Import your new file
+import bodyParser from 'body-parser';
+import dotenv from 'dotenv';
+import routes from './routes/index.js';
+import User from './model/user.js';
+
+// Load environment variables
+dotenv.config();
 
 const app = express();
+const PORT = process.env.PORT || 5000;
 
-// Configure CORS to allow requests from the client origin
-const corsOptions = {
-  origin: 'http://localhost:5173', // Assuming Vite runs on port 5173 by default
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+// Configure CORS to allow requests from the client
+app.use(cors({
+  origin: ['http://localhost:5173', 'http://localhost:3000'],
   credentials: true
+}));
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+// Add a simple test endpoint
+app.get('/api/test', (req, res) => {
+  res.json({ 
+    success: true, 
+    message: 'Server is working!', 
+    timestamp: new Date().toISOString() 
+  });
+});
+
+app.use('/api', routes);
+
+// Initialize database tables
+const initializeDatabase = async () => {
+  try {
+    await User.createTable();
+    console.log('Database initialized successfully');
+  } catch (error) {
+    console.error('Database initialization failed:', error);
+  }
 };
 
-app.use(cors(corsOptions));
-app.use(express.json());
-
-app.post('/login', async (req, res) => {
-  const { email, password, role } = req.body;
-
-  try {
-    // Check if the user exists with that email, password, AND role
-    const [users] = await db.query(
-      "SELECT id, name, email, role FROM users WHERE email = ? AND password = ? AND role = ?", 
-      [email, password, role]
-    );
-
-    if (users.length > 0) {
-      // If user exists
-      res.status(200).json({ 
-        success: true, 
-        message: "Login successful", 
-        user: users[0] 
-      });
-    } else {
-      // If user doesn't exist or wrong password
-      res.status(401).json({ 
-        success: false, 
-        message: "Account not found or invalid credentials" 
-      });
-    }
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ success: false, message: "Internal server error" });
-  }
+app.listen(PORT, async () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
+  await initializeDatabase();
 });
 
-
-app.post('/register', async (req, res) => {
-  const { name, email, password, role } = req.body;
-  try {
-    // Check if email already exists
-    const [existingUsers] = await db.query(
-      "SELECT id FROM users WHERE email = ?", 
-      [email]
-    );
-    if (existingUsers.length > 0) {
-      return res.status(400).json({ 
-        success: false, 
-        message: "Email already registered" 
-      });
-    }
-    // Insert new user
-    const [result] = await db.query(
-      "INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)",
-      [name, email, password, role]
-    );
-
-    res.status(201).json({
-      success: true,
-      message: "User registered successfully",
-      userId: result.insertId
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ success: false, message: "Internal server error" });
-  }
-});
-
-
-
-
-
-const PORT = process.env.PORT || 8081;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+export default app;

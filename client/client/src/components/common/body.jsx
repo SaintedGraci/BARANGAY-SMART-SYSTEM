@@ -1,5 +1,5 @@
 import React from 'react';
-import barangayImg from '../../assets/barangay.jpg';
+import municipalImg from '../../assets/barangay.jpg';
 import { Link } from 'react-router-dom';
 const Body = () => {
   return (
@@ -7,8 +7,8 @@ const Body = () => {
       {/* Background Image Container */}
       <div className="absolute inset-0 z-0">
         <img 
-          src={barangayImg} 
-          alt="Barangay Hall" 
+          src={municipalImg} 
+          alt="Municipal Hall" 
           className="w-full h-full object-cover scale-105 animate-pulse-slow"
         />
         {/* Modern Multi-layer Overlay */}
@@ -26,13 +26,13 @@ const Body = () => {
           <h1 className="text-5xl md:text-7xl font-extrabold text-white leading-tight">
             Welcome to the <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">
-              Barangay System
+              Municipality of Alicia
             </span>
           </h1>
           
           <p className="mt-6 text-lg md:text-xl text-slate-200 leading-relaxed max-w-2xl font-light">
-            Empowering our community through digital innovation. Access public records, 
-            request documents, and stay informed with real-time updates.
+            Empowering our municipality through digital innovation. Access public records, 
+            request documents, and stay informed with real-time updates from your local government.
           </p>
 
           
