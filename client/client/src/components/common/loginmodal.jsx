@@ -1,110 +1,189 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import { X, Mail, Lock, Eye, EyeOff, LogIn, AlertCircle } from 'lucide-react';
 import api from '../../API/axios';
 import { useNavigate } from 'react-router-dom';
 
 const LoginModal = ({ onClose }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [role, setRole] = useState('resident');
+  const [formData, setFormData] = useState({
+    email: '',
+    password: ''
+  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
 
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    // Clear error when user starts typing
+    if (errorMessage) setErrorMessage('');
+  };
+
   const handleLogin = async (e) => {
     e.preventDefault();
-    setErrorMessage(''); // Clear previous errors
+    setIsLoading(true);
+    setErrorMessage('');
 
     try {
-      const response = await api.post('/login', { 
-        email, 
-        password, 
-        role 
+      // Try resident login first
+      const response = await api.post('/auth/login', {
+        ...formData,
+        userType: 'resident'
       });
 
       if (response.data.success) {
-        // 1. Save user data to local storage
+        // Save user data and token
+        localStorage.setItem('token', response.data.token);
         localStorage.setItem('user', JSON.stringify(response.data.user));
         
-        // 2. Alert and Close
-        alert(`Welcome back, ${response.data.user.name}!`);
+        // Success feedback
+        const userName = response.data.user.firstName || 'User';
+        
+        // Close modal first
         onClose();
         
-        // 3. Redirect based on role
-        if (role === 'admin') {
-          navigate('/admin-dashboard');
-        } else {
-          navigate('/dashboard');
-        }
+        // Navigate based on user type
+        setTimeout(() => {
+          if (response.data.user.userType === 'barangay') {
+            navigate('/barangay-dashboard');
+          } else {
+            navigate('/dashboard');
+          }
+        }, 100);
+
+        // Show success message
+        setTimeout(() => {
+          alert(`Welcome back, ${userName}!`);
+        }, 200);
       }
     } catch (err) {
-      // Handle "Account not found" or "Invalid credentials"
-      if (err.response) {
+      console.error('Login error:', err);
+      if (err.response?.data?.message) {
         setErrorMessage(err.response.data.message);
+      } else if (err.response?.status === 401) {
+        setErrorMessage('Invalid email or password');
       } else {
-        setErrorMessage("Server is not responding. Check if backend is running.");
+        setErrorMessage('Unable to connect to server. Please try again.');
       }
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md mx-4 relative">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+      <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden relative transform transition-all">
+        {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl"
+          className="absolute top-6 right-6 text-gray-400 hover:text-gray-600 transition-colors z-10"
         >
-          ×
+          <X size={24} />
         </button>
-        
-        <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">Login</h2>
-        
-        <form onSubmit={handleLogin} className="space-y-4">
+
+        {/* Header */}
+        <div className="bg-gradient-to-br from-blue-600 to-blue-700 px-8 py-10 text-white">
+          <div className="flex items-center justify-center mb-4">
+            <div className="bg-white/20 p-3 rounded-full">
+              <LogIn size={32} />
+            </div>
+          </div>
+          <h2 className="text-2xl font-bold text-center mb-2">Welcome Back</h2>
+          <p className="text-blue-100 text-center text-sm">Sign in to your account</p>
+        </div>
+
+        {/* Form */}
+        <div className="p-8">
           {errorMessage && (
-            <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm border border-red-100">
-              {errorMessage}
+            <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl mb-6 flex items-start gap-3">
+              <AlertCircle size={20} className="text-red-500 mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="font-medium text-sm">Login Failed</p>
+                <p className="text-sm opacity-90">{errorMessage}</p>
+              </div>
             </div>
           )}
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
-            <select
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+
+          <form onSubmit={handleLogin} className="space-y-5">
+            {/* Email Input */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">Email Address</label>
+              <div className="relative">
+                <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  placeholder="Enter your email"
+                  required
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl py-3.5 pl-12 pr-4 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                />
+              </div>
+            </div>
+
+            {/* Password Input */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">Password</label>
+              <div className="relative">
+                <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  name="password"
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  placeholder="Enter your password"
+                  required
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl py-3.5 pl-12 pr-12 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
+            </div>
+
+            {/* Login Button */}
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 rounded-xl font-semibold hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg shadow-blue-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
-              <option value="resident">Resident</option>
-              <option value="admin">Admin</option>
-            </select>
+              {isLoading ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                  Signing In...
+                </>
+              ) : (
+                <>
+                  <LogIn size={20} />
+                  Sign In
+                </>
+              )}
+            </button>
+          </form>
+
+          {/* Additional Info */}
+          <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-xl">
+            <p className="text-sm text-blue-800 text-center">
+              <strong>Note:</strong> Barangay officials should use the dedicated barangay login portal.
+            </p>
           </div>
-          
-          <button
-            type="submit"
-            className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
-          >
-            Login
-          </button>
-        </form>
+
+          {/* Forgot Password Link */}
+          <div className="text-center mt-6">
+            <button className="text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors">
+              Forgot your password?
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
