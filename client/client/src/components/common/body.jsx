@@ -1,16 +1,19 @@
-import React from 'react';
-import municipalImg from '../../assets/barangay.jpg';
 import { Link } from 'react-router-dom';
+import alicia from '../../assets/aliciavid.mp4';
 const Body = () => {
   return (
     <main className="relative min-h-screen w-full overflow-hidden">
       {/* Background Image Container */}
       <div className="absolute inset-0 z-0">
-        <img 
-          src={municipalImg} 
-          alt="Municipal Hall" 
-          className="w-full h-full object-cover scale-105 animate-pulse-slow"
+        <video 
+          src={alicia} 
+          autoPlay 
+          loop 
+          muted 
+          playsInline
+          className="w-full h-full object-cover scale-105"
         />
+        
         {/* Modern Multi-layer Overlay */}
         <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-[1px]"></div>
         <div className="absolute inset-0 bg-gradient-to-b from-slate-900/60 via-transparent to-slate-900/90"></div>
@@ -37,7 +40,7 @@ const Body = () => {
 
           
           <div className="mt-10 flex flex-wrap gap-4">
-            <Link to="/register">
+            <Link to="/login">
             <button className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold transition-all hover:shadow-[0_0_20px_rgba(37,99,235,0.4)] active:scale-95">
               Get Started
             </button>

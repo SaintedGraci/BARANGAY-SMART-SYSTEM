@@ -4,12 +4,14 @@ import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
 import routes from './routes/index.js';
 import User from './model/user.js';
+import DocumentRequest from './model/documentRequest.js';
+import Announcement from './model/announcement.js';
 
 // Load environment variables
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5002;
 
 // Configure CORS to allow requests from the client
 app.use(cors({
@@ -35,6 +37,8 @@ app.use('/api', routes);
 const initializeDatabase = async () => {
   try {
     await User.createTable();
+    await DocumentRequest.createTable();
+    await Announcement.createTable();
     console.log('Database initialized successfully');
   } catch (error) {
     console.error('Database initialization failed:', error);

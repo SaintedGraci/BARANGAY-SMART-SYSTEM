@@ -104,15 +104,17 @@ const Header = () => {
             
             <Link to="/login">
               <button className="text-slate-600 px-4 py-2 font-semibold hover:text-blue-600 transition-all duration-200 hover:bg-blue-50 rounded-lg">
-                Login
+                Resident Login
               </button>
             </Link>
 
-            <Link to="/register">
-              <button className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-2.5 rounded-xl font-semibold hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg shadow-blue-100 hover:shadow-blue-200 active:scale-95 transform">
-                Join Community
+            <Link to="/barangay-login">
+              <button className="bg-gradient-to-r from-emerald-600 to-emerald-700 text-white px-4 py-2 rounded-lg font-semibold hover:from-emerald-700 hover:to-emerald-800 transition-all duration-200 shadow-lg shadow-emerald-100 hover:shadow-emerald-200">
+                Barangay Login
               </button>
             </Link>
+
+
           </div>
 
           {/* Mobile Menu Button */}
@@ -172,15 +174,16 @@ const Header = () => {
               <div className="pt-4 border-t border-gray-200 space-y-3">
                 <Link to="/login" onClick={() => setIsMenuOpen(false)}>
                   <button className="w-full text-slate-600 px-4 py-3 font-semibold hover:text-blue-600 transition-all duration-200 hover:bg-blue-50 rounded-lg text-left">
-                    Login
+                    Resident Login
                   </button>
                 </Link>
                 
-                <Link to="/register" onClick={() => setIsMenuOpen(false)}>
-                  <button className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 py-3 rounded-xl font-semibold hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg">
-                    Join Community
+                <Link to="/barangay-login" onClick={() => setIsMenuOpen(false)}>
+                  <button className="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 text-white px-4 py-3 rounded-xl font-semibold hover:from-emerald-700 hover:to-emerald-800 transition-all duration-200 shadow-lg">
+                    Barangay Login
                   </button>
                 </Link>
+
               </div>
             </div>
           </div>

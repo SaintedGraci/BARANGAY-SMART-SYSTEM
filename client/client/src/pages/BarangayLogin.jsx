@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, ArrowLeft, Shield, Building2, AlertCircle } from 'lucide-react';
-import api from '../API/axios';
+import { authAPI, apiUtils } from '../api';
 import municipalityLogo from '../assets/alicia.jpg';
 
 const BarangayLogin = () => {
@@ -30,34 +30,24 @@ const BarangayLogin = () => {
     setError('');
 
     try {
-      const response = await api.post('/auth/login', {
-        ...formData,
-        userType: 'barangay'
-      });
+      const response = await authAPI.loginBarangay(formData);
       
-      if (response.data.success) {
+      if (response.success) {
         // Save barangay data and token
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('user', JSON.stringify(response.data.user));
+        localStorage.setItem('token', response.token);
+        localStorage.setItem('barangay', JSON.stringify(response.user)); // Save as 'barangay' for consistency
         
         // Navigate to barangay dashboard
         navigate('/barangay-dashboard');
         
         // Show welcome message
         setTimeout(() => {
-          alert(`Welcome to ${response.data.user.name} Dashboard!`);
+          alert(`Welcome to ${response.user.name} Dashboard!`);
         }, 200);
       }
     } catch (err) {
-      if (err.response?.data?.message) {
-        setError(err.response.data.message);
-      } else if (err.response?.status === 401) {
-        setError('Invalid barangay credentials or access denied');
-      } else if (err.code === 'NETWORK_ERROR' || err.message.includes('Network Error')) {
-        setError('Network connection failed. Please check if the server is running.');
-      } else {
-        setError('Unable to connect to server. Please try again.');
-      }
+      const errorMessage = apiUtils.handleError(err);
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
