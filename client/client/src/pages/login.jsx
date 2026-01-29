@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Mail, Lock, Eye, EyeOff, LogIn, AlertCircle, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import api from '../API/axios';
+import { authAPI, apiUtils } from '../api';
 import municipalityLogo from '../assets/alicia.jpg';
 
 const Login = () => {
@@ -35,34 +35,25 @@ const Login = () => {
     setMessageType('');
 
     try {
-      // Try resident login first
-      const response = await api.post('/auth/login', {
-        ...formData,
-        userType: 'resident'
-      });
+      const response = await authAPI.loginResident(formData);
 
-      if (response.data.success) {
+      if (response.success) {
         // Save user data and token
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('user', JSON.stringify(response.data.user));
+        localStorage.setItem('token', response.token);
+        localStorage.setItem('user', JSON.stringify(response.user));
         
         setMessage('Login successful! Redirecting...');
         setMessageType('success');
         
         // Redirect after a short delay
         setTimeout(() => {
-          navigate('/dashboard');
+          navigate('/resident-dashboard');
         }, 1500);
       }
     } catch (err) {
       console.error('Login error:', err);
-      if (err.response?.data?.message) {
-        setMessage(err.response.data.message);
-      } else if (err.response?.status === 401) {
-        setMessage('Invalid email or password');
-      } else {
-        setMessage('Unable to connect to server. Please try again.');
-      }
+      const errorMessage = apiUtils.handleError(err);
+      setMessage(errorMessage);
       setMessageType('error');
     } finally {
       setIsLoading(false);
@@ -191,16 +182,7 @@ const Login = () => {
                   Forgot your password?
                 </button>
               </div>
-              
-              <div className="text-center text-gray-500 text-sm">
-                Don't have an account?{' '}
-                <button 
-                  onClick={() => navigate('/register')}
-                  className="text-blue-600 hover:text-blue-700 font-medium transition-colors"
-                >
-                  Sign up here
-                </button>
-              </div>
+
             </div>
           </div>
         </div>
