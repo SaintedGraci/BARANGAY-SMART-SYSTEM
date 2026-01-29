@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { X, Mail, Lock, Eye, EyeOff, LogIn, AlertCircle } from 'lucide-react';
-import api from '../../API/axios';
+import { authAPI, apiUtils } from '../../api';
 import { useNavigate } from 'react-router-dom';
 
 const LoginModal = ({ onClose }) => {
@@ -29,29 +29,31 @@ const LoginModal = ({ onClose }) => {
     setErrorMessage('');
 
     try {
-      // Try resident login first
-      const response = await api.post('/auth/login', {
-        ...formData,
-        userType: 'resident'
-      });
+      const response = await authAPI.loginResident(formData);
 
-      if (response.data.success) {
+      if (response.success) {
         // Save user data and token
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('user', JSON.stringify(response.data.user));
+        localStorage.setItem('token', response.token);
+        
+        // Save user data with appropriate key based on user type
+        if (response.user.userType === 'barangay') {
+          localStorage.setItem('barangay', JSON.stringify(response.user));
+        } else {
+          localStorage.setItem('user', JSON.stringify(response.user));
+        }
         
         // Success feedback
-        const userName = response.data.user.firstName || 'User';
+        const userName = response.user.firstName || 'User';
         
         // Close modal first
         onClose();
         
         // Navigate based on user type
         setTimeout(() => {
-          if (response.data.user.userType === 'barangay') {
+          if (response.user.userType === 'barangay') {
             navigate('/barangay-dashboard');
           } else {
-            navigate('/dashboard');
+            navigate('/resident-dashboard');
           }
         }, 100);
 
@@ -62,13 +64,8 @@ const LoginModal = ({ onClose }) => {
       }
     } catch (err) {
       console.error('Login error:', err);
-      if (err.response?.data?.message) {
-        setErrorMessage(err.response.data.message);
-      } else if (err.response?.status === 401) {
-        setErrorMessage('Invalid email or password');
-      } else {
-        setErrorMessage('Unable to connect to server. Please try again.');
-      }
+      const errorMessage = apiUtils.handleError(err);
+      setErrorMessage(errorMessage);
     } finally {
       setIsLoading(false);
     }

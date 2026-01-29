@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "migrate": "node run-migration.js",
+    "seed": "node seed-data.js"
   },
   "dependencies": {
     "@vercel/node": "^3.0.28",

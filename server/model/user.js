@@ -20,6 +20,12 @@ class User {
         email VARCHAR(100) UNIQUE NOT NULL,
         password VARCHAR(255) NOT NULL,
         role ENUM('resident', 'admin') DEFAULT 'resident',
+        phone VARCHAR(20),
+        address TEXT,
+        dateOfBirth DATE,
+        gender ENUM('male', 'female', 'other'),
+        civilStatus ENUM('single', 'married', 'divorced', 'widowed'),
+        occupation VARCHAR(100),
         createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
       )
@@ -36,15 +42,37 @@ class User {
 
   // Create a new user (residents only through public registration)
   static async create(userData) {
-    const { name, email, password, role = 'resident' } = userData;
+    const { 
+      name, 
+      email, 
+      password, 
+      role = 'resident',
+      phone,
+      address,
+      dateOfBirth,
+      gender,
+      civilStatus,
+      occupation
+    } = userData;
     
     const query = `
-      INSERT INTO users (name, email, password, role)
-      VALUES (?, ?, ?, ?)
+      INSERT INTO users (name, email, password, role, phone, address, dateOfBirth, gender, civilStatus, occupation)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
     
     try {
-      const [result] = await db.execute(query, [name, email, password, role]);
+      const [result] = await db.execute(query, [
+        name, 
+        email, 
+        password, 
+        role,
+        phone || null,
+        address || null,
+        dateOfBirth || null,
+        gender || null,
+        civilStatus || null,
+        occupation || null
+      ]);
       return await User.findById(result.insertId);
     } catch (error) {
       if (error.code === 'ER_DUP_ENTRY') {
@@ -112,7 +140,7 @@ class User {
 
   // Update user
   async update(updateData) {
-    const allowedFields = ['name'];
+    const allowedFields = ['name', 'phone', 'address', 'dateOfBirth', 'gender', 'civilStatus', 'occupation'];
     const updates = [];
     const values = [];
 

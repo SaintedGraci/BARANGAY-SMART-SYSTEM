@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { User, Mail, Lock, ArrowLeft, ShieldCheck, Eye, EyeOff, UserPlus, AlertCircle, CheckCircle } from 'lucide-react';
-import api from '../API/axios';
+import { authAPI, apiUtils } from '../api';
 import municipalityLogo from '../assets/alicia.jpg';
 
 const Register = () => {
@@ -55,9 +55,9 @@ const Register = () => {
 
     try {
       const { confirmPassword, ...submitData } = formData;
-      const response = await api.post('/auth/register', submitData);
+      const response = await authAPI.registerResident(submitData);
       
-      if (response.data.success) {
+      if (response.success) {
         setSuccess(true);
         setTimeout(() => {
           navigate('/login');
@@ -65,13 +65,8 @@ const Register = () => {
       }
     } catch (err) {
       console.error('Registration error:', err);
-      if (err.response?.data?.message) {
-        setError(err.response.data.message);
-      } else if (err.response?.status === 409) {
-        setError('Email already registered. Please use a different email.');
-      } else {
-        setError('Unable to create account. Please try again.');
-      }
+      const errorMessage = apiUtils.handleError(err);
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
